@@ -46,3 +46,33 @@ def test_renewal_overdue():
 def test_renewal_ok():
     assert renewal_status(0, False, 5) == "renewed"
 
+# Branch coverage tests 
+def test_valid_days_zero_boundary():
+    assert late_fine("guest", 0, False) == 0
+
+def test_fine_under_cap_not_clamped():
+    assert late_fine("guest", 20, False) == 30
+
+def test_fine_exactly_at_cap():
+    assert late_fine("student", 114, False) == 200
+
+def test_overdue_and_damaged():
+    assert late_fine("student", 20, True) == 162
+
+def test_faculty_at_loan_limit_no_fine():
+    assert late_fine("faculty", 30, False) == 0
+
+def test_fine_exactly_100_still_allowed():
+    assert can_borrow(0, 100, "student") is True
+
+def test_student_at_book_limit():
+    assert can_borrow(3, 0, "student") is False
+
+def test_faculty_at_book_limit():
+    assert can_borrow(10, 0, "faculty") is False
+
+def test_renewal_one_renewal_ok():
+    assert renewal_status(1, False, 0) == "renewed"
+
+def test_reservation_beats_limit():
+    assert renewal_status(5, True, -5) == "denied"
